@@ -1,0 +1,55 @@
+{% extends "dashboard_layout.html" %}
+{% block dashboard_content %}
+
+<div class="container mt-3">
+  <h2 class="mb-4"><i class="bi bi-car-front-fill me-2"></i>My Offered Rides</h2>
+
+  {% if rides %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for ride in rides %}
+        {% if ride.Status != 'Cancelled' %}
+          <div class="col">
+            <div class="card shadow-sm border-0 h-100">
+              <div class="card-body">
+                <h5 class="card-title text-primary">
+                  <i class="bi bi-calendar-event me-2"></i>{{ ride.Ride_Date }} 
+                  <span class="text-muted small ms-2">{{ ride.Departure_Time }}</span>
+                </h5>
+
+                <p class="card-text mb-2">
+                  <i class="bi bi-geo-alt-fill text-success me-1"></i>
+                  <strong>From:</strong> {{ ride.Start_Address }}<br>
+                  <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                  <strong>To:</strong> {{ ride.End_Address }}
+                </p>
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                  <span class="badge bg-info text-dark">Fare: Rs {{ '%.0f' % ride.Total_Fare }}</span>
+                  <span class="badge bg-secondary">Seats: {{ ride.Available_Seats }}</span>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <a href="/ride/{{ ride.Ride_ID }}/passengers" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-people-fill me-1"></i>View Passengers
+                  </a>
+                  <a href="/ride/{{ ride.Ride_ID }}/edit" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-pencil-fill me-1"></i>Edit
+                  </a>
+                  <a href="/ride/{{ ride.Ride_ID }}/cancel" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this ride?');">
+                    <i class="bi bi-x-circle-fill me-1"></i>Cancel
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info mt-4" role="alert">
+      No offered rides yet. Start offering and rack up some karma points!
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

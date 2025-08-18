@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .profile-form-card {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 1.2rem;
+    border-left: 6px solid var(--accent-color);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+    color: var(--text-color);
+  }
+
+  .profile-form-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  .btn-primary {
+    background-color: var(--accent-color);
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+
+  .btn-primary:hover {
+    background-color: #d16850;
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="profile-form-card">
+    <h2 class="profile-form-title">Complete Your Student Profile</h2>
+
+    <form method="POST">
+      <div class="row">
+        <!-- Enrollment Number -->
+        <div class="col-md-6 mb-3">
+          <label for="enrollment" class="form-label">Enrollment Number</label>
+          <input type="text" class="form-control" id="enrollment" name="enrollment" required placeholder="e.g. FA23-BCS-123">
+        </div>
+
+        <!-- University -->
+        <div class="col-md-6 mb-3">
+          <label for="university" class="form-label">University</label>
+          <select class="form-select" id="university" name="university" required>
+            <option value="">Select your university</option>
+            {% for u in universities %}
+              <option value="{{ u[0] }}">{{ u[1] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Department -->
+        <div class="col-md-6 mb-3">
+          <label for="department" class="form-label">Department</label>
+          <input type="text" class="form-control" id="department" name="department" required placeholder="e.g. Computer Science">
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="col-md-6 mb-4">
+          <label for="emergency" class="form-label">Emergency Contact</label>
+          <input type="text" class="form-control" id="emergency" name="emergency" required placeholder="e.g. 03111234567">
+        </div>
+      </div>
+
+      <div class="text-end">
+        <button type="submit" class="btn btn-primary px-4">Save Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

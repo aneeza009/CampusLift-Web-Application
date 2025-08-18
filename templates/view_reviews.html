@@ -1,0 +1,33 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}Reviews - Coming Soon{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+  <div class="coming-soon-box text-center">
+    <h1>⭐ Reviews Section</h1>
+    <p>Coming Soon... Stay tuned for something great!</p>
+  </div>
+</div>
+
+<style>
+  .coming-soon-box {
+    background-color: white;
+    padding: 3rem;
+    border-left: 6px solid var(--accent-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .coming-soon-box h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  .coming-soon-box p {
+    color: var(--text-color);
+    font-size: 1.1rem;
+  }
+</style>
+{% endblock %}

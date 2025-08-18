@@ -1,0 +1,206 @@
+{% extends "dashboard_layout.html" %}
+{% block dashboard_content %}
+
+<!-- Map + Form container -->
+<div style="position: relative; height: 80vh; width: 100%;">
+  <div id="map" style="height: 100%; width: 100%; z-index: 1;"></div>
+
+  <!-- Floating UI -->
+ <div class="floating-ui" style="
+  position: absolute; 
+  top: 10px; 
+  left: 10px; 
+  z-index: 999; 
+  background: white; 
+  padding: 1rem; 
+  border-radius: 10px; 
+  width: 650px;  /* increased from 400 */
+  max-width: 95%; /* increased max width */
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+  overflow-y: auto; 
+  max-height: 75vh;">
+    <h5><i class="bi bi-car-front-fill"></i> Book a Ride</h5>
+
+    <!-- Filter form -->
+    <form class="row g-2 mb-3" method="get">
+      <div class="col-md-4">
+        <label class="form-label">From:</label>
+        <div class="input-group">
+          <input id="from" name="from" type="text" placeholder="From" class="form-control" value="{{ request.args.get('from', '') }}">
+          <button type="button" class="btn btn-outline-primary" onclick="geocodeStart()">📍</button>
+        </div>
+        <small><strong>Pinned:</strong> <span id="start_display">None</span></small>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">To:</label>
+        <div class="input-group">
+          <input id="to" name="to" type="text" placeholder="To" class="form-control" value="{{ request.args.get('to', '') }}">
+          <button type="button" class="btn btn-outline-primary" onclick="geocodeEnd()">📍</button>
+        </div>
+        <small><strong>Pinned:</strong> <span id="end_display">None</span></small>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Date:</label>
+        <input name="date" type="date" class="form-control" value="{{ request.args.get('date', '') }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Sort By:</label>
+        <select name="sort" class="form-select">
+          <option value="">Sort By</option>
+          <option value="earliest" {% if request.args.get('sort') == 'earliest' %}selected{% endif %}>Earliest</option>
+          <option value="cheapest" {% if request.args.get('sort') == 'cheapest' %}selected{% endif %}>Cheapest</option>
+          <option value="most_seats" {% if request.args.get('sort') == 'most_seats' %}selected{% endif %}>Most Seats</option>
+        </select>
+      </div>
+      <div class="col-md-12 text-end">
+        <button type="submit" class="btn btn-success">🔍 Search</button>
+      </div>
+    </form>
+
+    <!-- Ride Results -->
+    {% if rides %}
+      <div class="ride-cards" style="max-height: 50vh; overflow-y: auto;">
+        {% for ride in rides %}
+          <div class="card mb-2 shadow-sm" style="max-width: 600px; width: 100%; margin-left: auto; margin-right: auto;">
+            <div class="card-body">
+              <h6 class="card-title">{{ ride.Driver }}</h6>
+              <p class="card-text mb-1" style="white-space: normal;">
+                📍 {{ ride.Pickup }} → {{ ride.Dropoff }}<br>
+                📅 {{ ride.Ride_Date }} ⏰ {{ ride.Departure_Time }}<br>
+                💺 {{ ride.Available_Seats }} seats • 💸 Rs. {{ ride.Total_Fare }}
+              </p>
+              <div class="text-end">
+                <button class="btn btn-sm btn-primary"
+                        data-ride='{{ ride | tojson | safe }}'
+                        onclick="handleRideClick(this)">
+                  View on Map
+                </button>
+                <form action="{{ url_for('confirm_booking') }}" method="POST" class="d-inline">
+                  <input type="hidden" name="ride_id" value="{{ ride.Ride_ID }}">
+                  <input type="hidden" name="seat_count" value="1">
+                  <button type="submit" class="btn btn-sm btn-success">Book Now</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-muted">No rides found matching your criteria.</p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  const map = L.map('map').setView([33.6844, 73.0479], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+  const rides = {{ ride_coords | tojson | safe }} || [];
+  let markers = [];
+  let startMarker = null;
+  let endMarker = null;
+
+  function clearMarkers() {
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+  }
+
+  function showRideOnMap(ride) {
+    clearMarkers();
+    const start = [ride.StartLat, ride.StartLon];
+    const end = [ride.EndLat, ride.EndLon];
+
+    startMarker = L.marker(start).addTo(map).bindPopup(`Pickup: ${ride.Pickup}`).openPopup();
+    endMarker = L.marker(end).addTo(map).bindPopup(`Dropoff: ${ride.Dropoff}`);
+    markers.push(startMarker, endMarker);
+
+    const routeLine = L.polyline([start, end], { color: 'blue' }).addTo(map);
+    markers.push(routeLine);
+
+    map.fitBounds(L.latLngBounds(start, end), { padding: [30, 30] });
+  }
+
+  function handleRideClick(button) {
+    const ride = JSON.parse(button.getAttribute('data-ride'));
+    showRideOnMap(ride);
+  }
+
+  function reverseGeocode(lat, lon, callback) {
+    fetch(`https://photon.komoot.io/reverse?lat=${lat}&lon=${lon}`)
+      .then(res => res.json())
+      .then(data => {
+        const name = data.features?.[0]?.properties?.name || "Unknown Location";
+        callback(name);
+      })
+      .catch(() => callback("Unknown Location"));
+  }
+
+  function setStart(lat, lon, label = "Start") {
+    const coords = [lat, lon];
+    if (startMarker) map.removeLayer(startMarker);
+    startMarker = L.marker(coords).addTo(map).bindPopup(label).openPopup();
+    reverseGeocode(lat, lon, function(address) {
+      document.getElementById("from").value = address;
+      document.getElementById("start_display").innerText = address;
+    });
+    map.setView(coords, 15);
+  }
+
+  function setEnd(lat, lon, label = "End") {
+    const coords = [lat, lon];
+    if (endMarker) map.removeLayer(endMarker);
+    endMarker = L.marker(coords).addTo(map).bindPopup(label).openPopup();
+    reverseGeocode(lat, lon, function(address) {
+      document.getElementById("to").value = address;
+      document.getElementById("end_display").innerText = address;
+    });
+    map.setView(coords, 15);
+  }
+
+  map.on('click', function(e) {
+    const latlng = e.latlng;
+    if (!startMarker) {
+      setStart(latlng.lat, latlng.lng);
+    } else if (!endMarker) {
+      setEnd(latlng.lat, latlng.lng);
+    }
+  });
+
+  function geocodeStart() {
+    const location = document.getElementById("from").value;
+    if (!location) return alert("Type a start location.");
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          setStart(lat, lon, location);
+        } else {
+          alert("Start location not found.");
+        }
+      });
+  }
+
+  function geocodeEnd() {
+    const location = document.getElementById("to").value;
+    if (!location) return alert("Type an end location.");
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          setEnd(lat, lon, location);
+        } else {
+          alert("End location not found.");
+        }
+      });
+  }
+</script>
+
+{% endblock %}

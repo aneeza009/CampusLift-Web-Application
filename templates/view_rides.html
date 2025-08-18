@@ -1,0 +1,37 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}Available Rides - CampusLift{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Available Rides</h2>
+
+  {% for ride in rides %}
+    <div class="card mb-3 shadow-sm" style="border-left: 6px solid var(--accent-color); border-radius: 15px;">
+      <div class="card-body">
+        <h5 class="card-title">{{ ride.Driver_Name }}</h5>
+        <p class="card-text">
+          <strong>Vehicle:</strong> {{ ride.Vehicle }}<br>
+          <strong>Date:</strong> {{ ride.Ride_Date }}<br>
+          <strong>From:</strong> {{ ride.Start_Location }} → {{ ride.End_Location }}<br>
+          <strong>Pickup:</strong> {{ ride.Pickup_Location }}<br>
+          <strong>Dropoff:</strong> {{ ride.Dropoff_Location }}<br>
+          <strong>Departure:</strong> {{ ride.Departure_Time }} |
+          <strong>Arrival:</strong> {{ ride.Estimated_Arrival }}<br>
+          <strong>Seats:</strong> {{ ride.Available_Seats }} |
+          <strong>Fare:</strong> Rs.{{ ride.Total_Fare }}<br>
+          <strong>Status:</strong> {{ ride.Status }}
+        </p>
+        <div class="mt-3">
+          <!-- ✅ Fixed: changed endpoint name -->
+        <a href="{{ url_for('view_student_profile', user_id=ride.User_ID) }}" class="btn btn-sm btn-outline-primary me-2">View Driver</a>
+<a href="{{ url_for('view_vehicles', vehicle_id=ride.Vehicle_ID) }}" class="btn btn-sm btn-outline-success">View Vehicle</a>
+
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
+

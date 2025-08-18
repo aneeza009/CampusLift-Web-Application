@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ride Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <h2>Ride Route</h2>
+  <div id="map" style="height: 500px;"></div>
+
+  <script>
+    function initMap() {
+      const pickup = [{{ ride[1]|default(0)|safe }}, {{ ride[2]|default(0)|safe }}];
+      const dropoff = [{{ ride[4]|default(0)|safe }}, {{ ride[5]|default(0)|safe }}];
+
+      const map = L.map('map').setView(pickup, 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      L.marker(pickup).addTo(map).bindPopup("Pickup: {{ ride[0] }}").openPopup();
+      L.marker(dropoff).addTo(map).bindPopup("Dropoff: {{ ride[3] }}");
+    }
+
+    window.onload = initMap;
+  </script>
+</body>
+</html>

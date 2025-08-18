@@ -1,0 +1,162 @@
+{% extends "dashboard_layout.html" %}
+{% block dashboard_content %}
+
+<!-- Map + Form container -->
+<div style="position: relative; height: 80vh; width: 100%;">
+  <div id="map" style="height: 100%; width: 100%; z-index: 1;"></div>
+
+  <!-- Floating UI -->
+  <div class="floating-ui" style="position: absolute; top: 10px; left: 10px; z-index: 999; background: white; padding: 1rem; border-radius: 10px; width: 400px; max-width: 90%; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <h5><i class="bi bi-geo-alt-fill"></i> Offer a Ride</h5>
+
+    <form method="POST" class="row g-3 mt-2">
+      <input type="hidden" name="start_coords" id="start_coords">
+      <input type="hidden" name="end_coords" id="end_coords">
+      <input type="hidden" name="start_address" id="start_address">
+      <input type="hidden" name="end_address" id="end_address">
+
+      <!-- Start Location -->
+      <div class="col-12">
+        <label for="start_input" class="form-label">Start Location</label>
+        <div class="input-group">
+          <input type="text" id="start_input" class="form-control" placeholder="e.g. COMSATS Gate">
+          <button type="button" class="btn btn-outline-primary" onclick="geocodeStart()">📍 Pin Start</button>
+        </div>
+        <small><strong>📌 Selected:</strong> <span id="start_display">Click map or search</span></small>
+      </div>
+
+      <!-- End Location -->
+      <div class="col-12">
+        <label for="end_input" class="form-label">End Location</label>
+        <div class="input-group">
+          <input type="text" id="end_input" class="form-control" placeholder="e.g. Saddar">
+          <button type="button" class="btn btn-outline-primary" onclick="geocodeEnd()">📍 Pin End</button>
+        </div>
+        <small><strong>📌 Selected:</strong> <span id="end_display">Click map or search</span></small>
+      </div>
+
+      <!-- Ride Date & Time -->
+      <div class="col-md-6">
+        <label class="form-label">Date</label>
+        <input type="date" name="ride_date" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Time</label>
+        <input type="time" name="ride_time" class="form-control" required>
+      </div>
+
+      <!-- Vehicle & Fare -->
+      <div class="col-md-6">
+        <label class="form-label">Vehicle</label>
+        <select name="vehicle_id" class="form-select" required>
+          {% for v in vehicles %}
+            <option value="{{ v.id }}">{{ v.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Fare (optional)</label>
+        <input type="number" name="fare" class="form-control" min="0" step="0.01">
+      </div>
+
+      <!-- Seats -->
+      <div class="col-md-6">
+        <label class="form-label">Available Seats</label>
+        <input type="number" name="seats" class="form-control" min="1" max="8" required>
+      </div>
+
+      <!-- Submit -->
+      <div class="col-12 text-end">
+        <button type="submit" class="btn btn-primary px-4">Post Ride</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Leaflet Script -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  const map = L.map('map').setView([33.6844, 73.0479], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+  let startMarker = null, endMarker = null;
+
+  function reverseGeocode(lat, lon, callback) {
+    fetch(`https://photon.komoot.io/reverse?lat=${lat}&lon=${lon}`)
+      .then(res => res.json())
+      .then(data => {
+        const name = data.features?.[0]?.properties?.name || "Unknown Location";
+        callback(name);
+      })
+      .catch(() => callback("Unknown Location"));
+  }
+
+  function setStart(lat, lon, label = "Start Location") {
+    const coords = [lat, lon];
+    if (startMarker) map.removeLayer(startMarker);
+    startMarker = L.marker(coords).addTo(map).bindPopup(label).openPopup();
+    document.getElementById("start_coords").value = coords.join(",");
+    reverseGeocode(lat, lon, function(address) {
+      document.getElementById("start_address").value = address;
+      document.getElementById("start_display").innerText = address;
+    });
+    map.setView(coords, 15);
+  }
+
+  function setEnd(lat, lon, label = "End Location") {
+    const coords = [lat, lon];
+    if (endMarker) map.removeLayer(endMarker);
+    endMarker = L.marker(coords).addTo(map).bindPopup(label).openPopup();
+    document.getElementById("end_coords").value = coords.join(",");
+    reverseGeocode(lat, lon, function(address) {
+      document.getElementById("end_address").value = address;
+      document.getElementById("end_display").innerText = address;
+    });
+    map.setView(coords, 15);
+  }
+
+  map.on('click', function(e) {
+    const latlng = e.latlng;
+    if (!startMarker) {
+      setStart(latlng.lat, latlng.lng);
+    } else if (!endMarker) {
+      setEnd(latlng.lat, latlng.lng);
+    }
+  });
+
+  function geocodeStart() {
+    const location = document.getElementById("start_input").value;
+    if (!location) return alert("Type a start location.");
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          setStart(lat, lon, location);
+        } else {
+          alert("Start location not found.");
+        }
+      });
+  }
+
+  function geocodeEnd() {
+    const location = document.getElementById("end_input").value;
+    if (!location) return alert("Type an end location.");
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+          setEnd(lat, lon, location);
+        } else {
+          alert("End location not found.");
+        }
+      });
+  }
+</script>
+{% endblock %}

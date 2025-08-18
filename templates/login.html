@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+  .login-card {
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: 1.2rem;
+    max-width: 640px; /* 📏 Wider like register & profile */
+    width: 100%;
+    margin: auto;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+    border-left: 6px solid var(--accent-color);
+    color: var(--text-color);
+  }
+
+  .login-card h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .input-group-text {
+    background-color: var(--background-color);
+    border: 1px solid #ddd;
+    border-right: none;
+    color: var(--text-color);
+  }
+
+  .btn-login {
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    margin-top: 1rem;
+  }
+
+  .btn-login:hover {
+    background-color: #c86c54;
+  }
+
+  .bottom-text {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .bottom-text span {
+    color: var(--text-color);
+  }
+
+  .bottom-text a {
+    color: var(--accent-color);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .bottom-text a:hover {
+    text-decoration: underline;
+  }
+
+  .vh-90 {
+    min-height: 90vh;
+  }
+</style>
+
+<div class="d-flex justify-content-center align-items-center vh-90">
+  <div class="login-card">
+    <h2>Welcome to CampusLift</h2>
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+          <input name="email" type="email" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Password</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input name="password" type="password" class="form-control" id="password" required>
+          <span class="input-group-text" id="togglePassword" style="cursor: pointer;">
+            <i class="bi bi-eye-slash"></i>
+          </span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-login w-100">Login</button>
+    </form>
+
+    <div class="bottom-text">
+      <span>Don't have an account?</span>
+      <a href="{{ url_for('register') }}">Register</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+</div>
+
+<script>
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+
+  togglePassword.addEventListener('click', function () {
+    const isPassword = passwordInput.getAttribute('type') === 'password';
+    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+    const icon = this.querySelector('i');
+    icon.classList.toggle('bi-eye');
+    icon.classList.toggle('bi-eye-slash');
+  });
+</script>
+
+{% endblock %}

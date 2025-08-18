@@ -1,0 +1,79 @@
+{% extends "dashboard_layout.html" %}
+{% block dashboard_content %}
+<style>
+  .booking-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    background-color: #fefefe;
+    transition: box-shadow 0.2s;
+  }
+
+  .booking-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .cancel-button {
+    background-color: #ffcccc;
+    color: red;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .cancel-button:hover {
+    background-color: #ffb3b3;
+  }
+
+  .filter-links {
+    margin-bottom: 20px;
+  }
+
+  .filter-links a {
+    margin-right: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #444;
+    padding: 5px 10px;
+    border-radius: 6px;
+  }
+
+  .filter-links a.active {
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+  }
+</style>
+
+<div class="filter-links">
+  <a href="{{ url_for('my_bookings', filter='upcoming') }}" class="{{ 'active' if filter == 'upcoming' else '' }}">Upcoming</a>
+  <a href="{{ url_for('my_bookings', filter='past') }}" class="{{ 'active' if filter == 'past' else '' }}">Past</a>
+  <a href="{{ url_for('my_bookings', filter='cancelled') }}" class="{{ 'active' if filter == 'cancelled' else '' }}">Cancelled</a>
+  <a href="{{ url_for('my_bookings', filter='all') }}" class="{{ 'active' if filter == 'all' else '' }}">All</a>
+</div>
+
+{% if bookings %}
+  {% for booking in bookings %}
+    <div class="booking-card">
+      <p><strong>Driver:</strong> {{ booking.Driver_Name }} | <strong>Phone:</strong> {{ booking.Driver_Phone }}</p>
+      <p><strong>Pickup:</strong> {{ booking.Pickup }} ➡️ <strong>Dropoff:</strong> {{ booking.Dropoff }}</p>
+      <p><strong>Date:</strong> {{ booking.Ride_Date }} | <strong>Time:</strong> {{ booking.Departure_Time }}</p>
+      <p><strong>Seats Booked:</strong> {{ booking.Seat_Count }}</p>
+      <p><strong>Status:</strong> {{ booking.Booking_Status }}</p>
+      <p><strong>Total Fare:</strong> Rs. {{ booking.Total_Fare }}</p>
+
+      {% if filter == 'upcoming' and booking.Booking_Status in ['Pending', 'Confirmed'] and booking.Ride_Date >= current_date %}
+        <form method="post" action="{{ url_for('cancel_booking') }}">
+          <input type="hidden" name="booking_id" value="{{ booking.Booking_ID }}">
+          <button type="submit" class="cancel-button">Cancel Booking</button>
+        </form>
+      {% endif %}
+    </div>
+  {% endfor %}
+{% else %}
+  <p>No bookings found for this filter.</p>
+{% endif %}
+{% endblock %}

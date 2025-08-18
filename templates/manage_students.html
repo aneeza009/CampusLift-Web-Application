@@ -1,0 +1,109 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}Manage Students - CampusLift{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">🎓 Manage Students</h2>
+
+  {% for student in students %}
+    <div class="card mb-4 shadow-sm" style="border-left: 6px solid var(--accent-color); border-radius: 15px;">
+      <div class="card-body">
+        <h5 class="card-title">{{ student.Full_Name }}</h5>
+        <p class="card-text">
+          <strong>Email:</strong> {{ student.Email }}<br>
+          <strong>Phone:</strong> {{ student.Phone }}<br>
+          <strong>Gender:</strong> {{ student.Gender }}<br>
+          <strong>Status:</strong> {{ student.Status }}<br>
+          <strong>CNIC:</strong> {{ student.CNIC }}
+        </p>
+
+        <button class="btn btn-sm btn-outline-primary" onclick="loadStudentDetails('{{ student.User_ID }}')">
+          View More
+        </button>
+
+        <div class="mt-3" id="details{{ student.User_ID }}">
+          <div id="content{{ student.User_ID }}" data-loaded="false" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<script>
+function loadStudentDetails(userId) {
+  const contentDiv = document.getElementById('content' + userId);
+  if (contentDiv.dataset.loaded === "true") return;
+
+  fetch(`/admin/student_details/${userId}`)
+    .then(response => response.json())
+    .then(data => {
+      let html = "";
+
+      if (data.Enrollment_No) {
+        html += `<div class='card mt-3'><div class='card-body'>
+          <h6 class='card-title text-primary'>🎓 Student Info</h6>
+          <p class='card-text'>
+            <strong>Enrollment No:</strong> ${data.Enrollment_No}<br>
+            <strong>University:</strong> ${data.University_Name}<br>
+            <strong>Department:</strong> ${data.Department}<br>
+            <strong>Emergency Contact:</strong> ${data.Emergency_Contact}<br>
+            <strong>Verified:</strong> ${data.Is_Verified ? "Yes" : "No"}
+          </p>
+        </div></div>`;
+      }
+
+      if (data.VehicleType) {
+        html += `<div class='card mt-3'><div class='card-body'>
+          <h6 class='card-title text-success'>🚗 Driver Info</h6>
+          <p class='card-text'>
+            <strong>Type:</strong> ${data.VehicleType}<br>
+            <strong>Plate No:</strong> ${data.Plate_No}<br>
+            <strong>Color:</strong> ${data.Color}<br>
+            <strong>Model:</strong> ${data.Model}<br>
+            <strong>Capacity:</strong> ${data.Capacity}<br>
+            <strong>Active:</strong> ${data.Vehicle_Active ? "Yes" : "No"}
+          </p>
+        </div></div>`;
+      }
+
+      if (data.Rides?.length > 0) {
+        const rides = Array.from(new Set(data.Rides.map(r => JSON.stringify(r)))).map(r => JSON.parse(r));
+        html += `<div class='card mt-3'><div class='card-body'>
+          <h6 class='card-title text-warning'>🛣️ Rides Offered</h6><ul class='mb-0'>`;
+        rides.forEach(ride => {
+          html += `<li>${ride.Start_Location} → ${ride.End_Location} | ${ride.Ride_Date} ${ride.Departure_Time} | Seats: ${ride.Available_Seats} | ${ride.Ride_Status}</li>`;
+        });
+        html += `</ul></div></div>`;
+      }
+
+      if (data.Bookings?.length > 0) {
+        const bookings = Array.from(new Set(data.Bookings.map(b => JSON.stringify(b)))).map(b => JSON.parse(b));
+        html += `<div class='card mt-3'><div class='card-body'>
+          <h6 class='card-title text-info'>📦 Bookings Made</h6><ul class='mb-0'>`;
+        bookings.forEach(booking => {
+          html += `<li>Booking ID: ${booking.Booking_ID} | Seats: ${booking.Seat_Count} | ${booking.Booking_Status}</li>`;
+        });
+        html += `</ul></div></div>`;
+      }
+
+      if (data.Reviews?.length > 0) {
+        const reviews = Array.from(new Set(data.Reviews.map(r => JSON.stringify(r)))).map(r => JSON.parse(r));
+        html += `<div class='card mt-3'><div class='card-body'>
+          <h6 class='card-title text-secondary'>⭐ Reviews</h6><ul class='mb-0'>`;
+        reviews.forEach(review => {
+          html += `<li><strong>${review.Type}:</strong> ${review.Rating} ★ - ${review.Comment} (${review.Timestamp})</li>`;
+        });
+        html += `</ul></div></div>`;
+      }
+
+      contentDiv.innerHTML = html || "<p>No additional details available.</p>";
+      contentDiv.dataset.loaded = "true";
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      contentDiv.innerHTML = `<p class="text-danger">Failed to load details.</p>`;
+    });
+}
+</script>
+{% endblock %}

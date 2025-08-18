@@ -1,0 +1,173 @@
+{% extends "dashboard_layout.html" %}
+{% block dashboard_content %}
+
+<style>
+  .profile-form-card {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 1.2rem;
+    border-left: 6px solid var(--accent-color);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+    color: var(--text-color);
+    max-width: 700px;
+    margin: 2rem auto;
+  }
+
+  .profile-form-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  .btn-primary {
+    background-color: var(--accent-color);
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: #d16850;
+  }
+
+  .text-muted {
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+</style>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show mx-auto mt-3" style="max-width: 700px;" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if is_driver %}
+  <!-- Already a driver: Show vehicle details and update form -->
+  <div class="alert alert-success mt-4 text-center">
+    You’re already registered as a driver!
+  </div>
+
+  {% if vehicle %}
+    <div class="card shadow-sm mb-4 mt-3 mx-auto" style="max-width: 700px;">
+      <div class="card-header text-white" style="background-color: var(--primary-color); font-weight: bold;">
+        Your Registered Vehicle
+      </div>
+      <div class="card-body">
+        <p><strong>Type:</strong> {{ vehicle['VehicleType'] }}</p>
+        <p><strong>Plate:</strong> {{ vehicle['Plate_No'] }}</p>
+        <p><strong>Model:</strong> {{ vehicle['Model'] }}</p>
+        <p><strong>Color:</strong> {{ vehicle['Color'] }}</p>
+        <p><strong>Capacity:</strong> {{ vehicle['Capacity'] }}</p>
+        {% if license_no %}
+          <p><strong>License Number:</strong> {{ license_no }}</p>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Update vehicle form -->
+  <div class="card shadow-sm mt-3 mx-auto" style="max-width: 700px;">
+    <div class="card-header" style="background-color: var(--accent-color); color: white;">Update Vehicle Details</div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('update_vehicle') }}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Vehicle Type</label>
+            <select name="vehicle_type" class="form-select" required>
+              <option value="Car" {{ 'selected' if vehicle['VehicleType'] == 'Car' else '' }}>Car</option>
+              <option value="Bike" {{ 'selected' if vehicle['VehicleType'] == 'Bike' else '' }}>Bike</option>
+              <option value="Van" {{ 'selected' if vehicle['VehicleType'] == 'Van' else '' }}>Van</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Model</label>
+            <input type="text" name="model" class="form-control" value="{{ vehicle['Model'] }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Plate No.</label>
+            <input type="text" name="plate_no" class="form-control" value="{{ vehicle['Plate_No'] }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Color</label>
+            <input type="text" name="color" class="form-control" value="{{ vehicle['Color'] }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Capacity</label>
+            <input type="number" name="capacity" class="form-control" min="1" value="{{ vehicle['Capacity'] }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">License Number</label>
+            <input type="text" name="license_no" class="form-control" value="{{ license_no }}" required>
+          </div>
+        </div>
+
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-primary px-4 py-2" style="font-size: 0.9rem;">Update Details</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% else %}
+  <!-- New driver registration form -->
+  <div class="profile-form-card">
+    <h2 class="profile-form-title">Register as a Driver</h2>
+
+    <form method="POST" action="{{ url_for('register_vehicle') }}">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Vehicle Type</label>
+          <select name="vehicle_type" class="form-select" required>
+            <option value="Car" {% if vehicle and vehicle['VehicleType'] == 'Car' %}selected{% endif %}>Car</option>
+            <option value="Bike" {% if vehicle and vehicle['VehicleType'] == 'Bike' %}selected{% endif %}>Bike</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Model</label>
+          <input type="text" name="model" class="form-control" value="{{ vehicle['Model'] if vehicle }}" required placeholder="e.g., Civic 2022">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Plate No.</label>
+          <input type="text" name="plate_no" class="form-control" value="{{ vehicle['Plate_No'] if vehicle }}" required placeholder="e.g., ABC-1234">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Color</label>
+          <input type="text" name="color" class="form-control" value="{{ vehicle['Color'] if vehicle }}" required placeholder="e.g., Black">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Capacity</label>
+          <input type="number" name="capacity" class="form-control" min="1" value="{{ vehicle['Capacity'] if vehicle }}" required placeholder="e.g., 4">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">License Number</label>
+          <input type="text" name="license_no" class="form-control" value="{{ license_no }}" required placeholder="e.g., LHR-987654321">
+        </div>
+      </div>
+
+      <div class="text-end mt-4">
+        <button type="submit" class="btn btn-primary px-4 py-2" style="font-size: 0.9rem;">Register as Driver</button>
+      </div>
+    </form>
+  </div>
+{% endif %}
+
+{% endblock %}

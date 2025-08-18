@@ -1,0 +1,41 @@
+{% extends "dashboard_layout.html" %}
+
+{% block dashboard_content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Profile Overview</h2>
+  
+  <div class="card shadow rounded">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <strong>Name:</strong> {{ profile.name }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Email:</strong> {{ profile.email }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Phone:</strong> {{ profile.phone }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>CNIC:</strong> {{ profile.cnic }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Gender:</strong> {{ profile.gender }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Enrollment:</strong> {{ profile.enrollment }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Department:</strong> {{ profile.department }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>University:</strong> {{ profile.university }} ({{ profile.city }})
+        </div>
+      </div>
+      <div class="text-end mt-4">
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

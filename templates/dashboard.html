@@ -1,0 +1,18 @@
+{% extends "dashboard_layout.html" %}
+
+{% block dashboard_content %}
+  <h2>Welcome, {{ fname }}!</h2>
+  <div class="card">
+    <h5>Student Summary</h5>
+    <div class="row">
+      <div class="col-md-6">
+        <p><strong>Enrollment No:</strong> {{ student.enrollment }}</p>
+        <p><strong>University:</strong> {{ student.university }}</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>Department:</strong> {{ student.department }}</p>
+        <p><strong>Driver Status:</strong> {{ 'Yes' if student.is_driver else 'No' }}</p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

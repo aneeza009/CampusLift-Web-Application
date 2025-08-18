@@ -1,0 +1,49 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}View Bookings - CampusLift{% endblock %}
+
+{% block content %}
+<h2 class="mb-4 text-center">📚 View Bookings</h2>
+
+{% for booking in bookings %}
+<div class="card">
+  <h5>🧍‍♂️ Student: {{ booking.Student_Name }} ({{ booking.Student_Email }})</h5>
+  <p>
+    <strong>Driver:</strong> {{ booking.Driver_Name }}<br>
+    <strong>Ride Date:</strong> {{ booking.Ride_Date }}<br>
+    <strong>Pickup:</strong> {{ booking.Pickup_Location }}<br>
+    <strong>Dropoff:</strong> {{ booking.Dropoff_Location }}<br>
+    <strong>Seats Booked:</strong> {{ booking.Seat_Count }}<br>
+    <strong>Status:</strong> {{ booking.Booking_Status }}
+  </p>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{{ url_for('view_rides', ride_id=booking.Ride_ID) }}" class="btn btn-custom">🚗 Ride Details</a>
+    <a href="{{ url_for('view_student', user_id=booking.Student_ID) }}" class="btn btn-outline-secondary">👤 View Student</a>
+    <a href="{{ url_for('view_student', user_id=booking.Driver_ID) }}" class="btn btn-outline-secondary">🧑‍✈️ View Driver</a>
+  </div>
+</div>
+{% else %}
+<p class="text-center text-muted">No bookings found.</p>
+{% endfor %}
+
+<style>
+  .card {
+    background-color: white;
+    border-left: 5px solid var(--accent-color);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  .btn-custom {
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 10px;
+  }
+
+  .btn-custom:hover {
+    background-color: #d16850;
+  }
+</style>
+{% endblock %}

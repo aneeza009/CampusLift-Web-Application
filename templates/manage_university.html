@@ -1,0 +1,59 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}Manage Universities{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">🏫 Manage Universities</h2>
+
+  <!-- Add University Form -->
+  <form method="POST" class="shadow-card mb-5">
+    <div class="mb-3">
+      <label for="university_name" class="form-label">University Name</label>
+      <input type="text" class="form-control" id="university_name" name="university_name" required>
+    </div>
+    <div class="mb-3">
+      <label for="city" class="form-label">City</label>
+      <input type="text" class="form-control" id="city" name="city">
+    </div>
+    <div class="mb-3">
+      <label for="contact_email" class="form-label">Contact Email</label>
+      <input type="email" class="form-control" id="contact_email" name="contact_email">
+    </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="is_approved" name="is_approved">
+      <label class="form-check-label" for="is_approved">Is Approved</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Add University</button>
+  </form>
+
+  <!-- University List -->
+  <h4>📋 Existing Universities</h4>
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover">
+      <thead class="table-success">
+        <tr>
+          <th>ID</th>
+          <th>University Name</th>
+          <th>City</th>
+          <th>Contact Email</th>
+          <th>Approved</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for uni in universities %}
+        <tr>
+          <td>{{ uni[0] }}</td>
+          <td>{{ uni[1] }}</td>
+          <td>{{ uni[2] }}</td>
+          <td>{{ uni[3] }}</td>
+          <td>{{ '✅' if uni[4] else '❌' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <a href="{{ url_for('admin_dashboard') }}" class="btn btn-link mt-3">← Back to Dashboard</a>
+</div>
+{% endblock %}

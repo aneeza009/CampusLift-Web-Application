@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+  .dashboard-container {
+    display: flex;
+    min-height: calc(100vh - 120px);
+    margin: 0;
+    padding: 0;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 56px; /* right below your navbar */
+    left: 0;
+    width: 290px;
+    height: calc(100vh - 56px);
+    background-color: #6B8E75; /* darker sage green than navbar */
+    padding: 2rem 1.2rem;
+    color: white;
+    overflow-y: auto;
+    z-index: 1100;
+    transition: top 0.3s ease;
+  }
+
+  .sidebar h5 {
+    color: white;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: left;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .sidebar .nav-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    transition: all 0.25s ease;
+  }
+
+  .sidebar .nav-link:hover {
+    background-color: #a3b9a4; /* lighter sage */
+    color: white; /* stay white on hover */
+    font-weight: 600;
+  }
+
+  .sidebar .nav-link.active {
+    background-color: #a3b9a4; /* lighter sage */
+    color: white; /* no more yellow */
+    font-weight: 700;
+  }
+
+  .main-content {
+    margin-left: 240px; /* sidebar width */
+    flex-grow: 1;
+    padding: 2rem 2.5rem;
+    background-color: #fafafa;
+  }
+
+  .main-content h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    border: none;
+    border-left: 6px solid var(--accent-color);
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.06);
+    padding: 1.5rem;
+    background-color: white;
+  }
+
+  .card h5 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .card p {
+    margin: 0.3rem 0;
+    color: var(--text-color);
+  }
+  .sidebar .nav-link:hover,
+.sidebar .nav-link:focus,
+.sidebar .nav-link:active {
+  color: white !important;
+}
+
+.sidebar.scrolled {
+  top: 0 !important;
+}
+
+
+</style>
+
+
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h5>Menu</h5>
+    <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.path == url_for('dashboard') %}active{% endif %}">Dashboard Overview</a>
+
+    <!-- Always visible student features -->
+<a href="{{ url_for('book_ride') }}" class="nav-link {% if request.path == url_for('book_ride') %}active{% endif %}">Book a Ride</a>
+<a href="{{ url_for('my_bookings') }}" class="nav-link {% if request.path == url_for('my_bookings') %}active{% endif %}">My Bookings</a>
+<a href="{{ url_for('register_vehicle') }}" class="nav-link {% if request.path == url_for('register_vehicle') %}active{% endif %}">Register as Driver</a>
+
+<!-- Driver-only features -->
+{% if is_driver %}
+  <a href="{{ url_for('offer_ride') }}" class="nav-link {% if request.path == url_for('offer_ride') %}active{% endif %}">Offer a Ride</a>
+  <a href="{{ url_for('my_offered_rides') }}" class="nav-link {% if request.path == url_for('my_offered_rides') %}active{% endif %}">My Ride Offers</a>
+  <a href="{{ url_for('my_reviews') }}" class="nav-link {% if request.path == url_for('my_reviews') %}active{% endif %}">My Reviews</a>
+{% endif %}
+
+
+    <a href="{{ url_for('profile') }}" class="nav-link {% if request.path == url_for('profile') %}active{% endif %}">View Profile</a>
+    <a href="{{ url_for('logout') }}" class="nav-link text-danger">Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    {% block dashboard_content %}{% endblock %}
+  </div>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div style="margin-bottom: 1rem;">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" style="
+              padding: 10px;
+              border-radius: 8px;
+              margin-bottom: 10px;
+              color: {% if category == 'danger' %}#721c24{% elif category == 'warning' %}#856404{% else %}#155724{% endif %};
+              background-color: {% if category == 'danger' %}#f8d7da{% elif category == 'warning' %}#fff3cd{% else %}#d4edda{% endif %};
+              border: 1px solid {% if category == 'danger' %}#f5c6cb{% elif category == 'warning' %}#ffeeba{% else %}#c3e6cb{% endif %};
+          ">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+{% endblock %}
+
+<script>
+  window.addEventListener('scroll', function () {
+    const sidebar = document.querySelector('.sidebar');
+    const scrollY = window.scrollY;
+
+    if (scrollY > 50) {
+      sidebar.classList.add('scrolled');
+    } else {
+      sidebar.classList.remove('scrolled');
+    }
+  });
+</script>

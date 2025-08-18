@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+  .auth-card {
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: 1.2rem;
+    max-width: 640px;
+    width: 100%;
+    margin: auto;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+    border-left: 6px solid var(--accent-color);
+    color: var(--text-color);
+  }
+
+  .auth-card h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    margin-top: 1rem;
+  }
+
+  .btn-primary:hover {
+    background-color: #d16850;
+  }
+
+  .bottom-text {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .bottom-text a {
+    color: var(--accent-color);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .bottom-text a:hover {
+    text-decoration: underline;
+  }
+
+  .vh-90 {
+    min-height: 90vh;
+  }
+</style>
+
+<div class="d-flex justify-content-center align-items-center vh-90">
+  <div class="auth-card">
+    <h2>Create Your Account</h2>
+    <form method="POST" action="{{ url_for('register') }}">
+      <!-- First + Last Name side by side -->
+      <div class="row mb-3">
+        <div class="col">
+          <label for="fname" class="form-label">First Name</label>
+          <input type="text" class="form-control" name="fname" id="fname" required placeholder="John">
+        </div>
+        <div class="col">
+          <label for="lname" class="form-label">Last Name</label>
+          <input type="text" class="form-control" name="lname" id="lname" required placeholder="Doe">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-control" name="email" required placeholder="example@email.com">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Phone Number</label>
+        <input type="text" class="form-control" name="phone" required placeholder="03XXXXXXXXX">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">CNIC</label>
+        <input type="text" class="form-control" name="cnic" required placeholder="1234512345671">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Gender</label>
+        <select class="form-select" name="gender" required>
+          <option selected disabled value="">Choose...</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Create Password</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input type="password" class="form-control" id="password" name="password" required placeholder="At least 8 characters" minlength="8">
+          <span class="input-group-text toggle-icon" id="togglePassword"><i class="bi bi-eye-slash"></i></span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Register</button>
+    </form>
+
+    <div class="bottom-text">
+      <span>Already have an account?</span>
+      <a href="{{ url_for('login') }}">Log in</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+  togglePassword.addEventListener('click', function () {
+    const isPassword = passwordInput.getAttribute('type') === 'password';
+    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+    const icon = this.querySelector('i');
+    icon.classList.toggle('bi-eye');
+    icon.classList.toggle('bi-eye-slash');
+  });
+
+  document.querySelector("form").addEventListener("submit", function (e) {
+    if (passwordInput.value.length < 8) {
+      e.preventDefault();
+      alert("Password must be at least 8 characters long.");
+    }
+  });
+</script>
+
+{% endblock %}

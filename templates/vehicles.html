@@ -1,0 +1,45 @@
+{% extends "admin_layout.html" %}
+
+{% block title %}CampusLift Vehicles{% endblock %}
+
+{% block content %}
+<h2 class="text-center mb-4"><i class="bi bi-truck-front-fill"></i> CampusLift Vehicles</h2>
+
+<div class="row justify-content-center">
+  {% for vehicle in vehicles %}
+  <div class="vehicle-card col-md-5">
+    <h4 class="mb-3">🚘 Plate: {{ vehicle.Plate_No }}</h4>
+    <p><strong>Type:</strong> {{ vehicle.VehicleType }}</p>
+    <p><strong>Model:</strong> {{ vehicle.Model }}</p>
+    <p><strong>Color:</strong> {{ vehicle.Color }}</p>
+    <p><strong>Capacity:</strong> {{ vehicle.Capacity }}</p>
+    <p><strong>Active:</strong> {{ "Yes" if vehicle.Is_Active else "No" }}</p>
+    <p><strong>Owner:</strong> {{ vehicle.Owner_Name }}</p>
+
+    <a href="{{ url_for('view_student', user_id=vehicle.User_ID) }}">
+      <button class="btn btn-campuslift btn-sm mt-2"><i class="bi bi-person-fill"></i> View Owner</button>
+    </a>
+  </div>
+  {% else %}
+  <div class="col-12 text-center">
+    <p class="text-muted">No vehicles found.</p>
+  </div>
+  {% endfor %}
+</div>
+
+<style>
+  .vehicle-card {
+    background-color: white;
+    border-left: 5px solid var(--accent-color);
+    padding: 1.2rem;
+    margin: 1rem 0.8rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .vehicle-card h4 {
+    color: var(--accent-color);
+    font-weight: bold;
+  }
+</style>
+{% endblock %}
