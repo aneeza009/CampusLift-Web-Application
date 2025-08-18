@@ -1,21 +1,21 @@
-# 🚗 CampusLift – Web Application  
+#  CampusLift – Web Application  
 
 CampusLift is a ride-sharing platform built for university campuses. It connects students and drivers in a secure, efficient, and eco-friendly way. The system ensures safe commuting, reduces transportation costs, and helps minimize traffic congestion inside campuses.  
 
 ---
 
-## ✨ Features  
-- 👩‍🎓 **Student Registration** – Students can sign up and manage their profiles.  
-- 🚘 **Ride Offering** – Drivers (students with vehicles) can offer rides with details like route, timing, and available seats.  
-- 📅 **Ride Booking** – Students can book available rides instantly.  
-- 💳 **Payment Integration** – Simple payment management for completed rides.  
-- ⭐ **Review System** – Students can rate drivers and rides for trust and reliability.  
-- 🔒 **Admin Panel** – University admins can manage students, drivers, vehicles, and ride history.  
-- 🏫 **University Integration** – Supports multiple universities and their students.  
+##  Features  
+-  **Student Registration** – Students can sign up and manage their profiles.  
+-  **Ride Offering** – Drivers (students with vehicles) can offer rides with details like route, timing, and available seats.  
+-  **Ride Booking** – Students can book available rides instantly.  
+-  **Payment Integration** – Simple payment management for completed rides.  
+-  **Review System** – Students can rate drivers and rides for trust and reliability.  
+-  **Admin Panel** – University admins can manage students, drivers, vehicles, and ride history.  
+-  **University Integration** – Supports multiple universities and their students.  
 
 ---
 
-## 🏗️ Tech Stack  
+##  Tech Stack  
 - **Backend:** [Flask](https://flask.palletsprojects.com/) (Python)  
 - **Database:** Microsoft SQL Server (with stored procedures, views, and triggers)  
 - **Frontend:** Flask Templates (HTML, Jinja2, Bootstrap)  
@@ -24,7 +24,7 @@ CampusLift is a ride-sharing platform built for university campuses. It connects
 
 ---
 
-## 📂 Project Structure  
+##  Project Structure  
 
 
 CampusLift/
@@ -38,7 +38,7 @@ CampusLift/
 
 
 
-## ⚡ Installation & Setup  
+##  Installation & Setup  
 
 ### 1. Clone the repository  
 bash
@@ -81,7 +81,7 @@ flask run
 
 ---
 
-## 🚀 Future Enhancements
+##  Future Enhancements
 
 * Mobile App integration for Android/iOS
 * Advanced search & route optimization
@@ -90,7 +90,7 @@ flask run
 
 ---
 
-## 👩‍💻 Authors  
+##  Authors  
 
 - **Aneeza Naheen**  
   📌 GitHub: [aneeza009](https://github.com/aneeza009)  
