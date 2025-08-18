@@ -90,12 +90,14 @@ flask run
 
 ---
 
-## 👩‍💻 Author
+## 👩‍💻 Authors  
 
-**Aneeza Naheen**
-**Muneefah Shahzad**
-**Adan Zia**
-📌 GitHub: [aneeza009](https://github.com/aneeza009)
-📌 GitHub: [aneeza009]((https://github.com/mun33fa))
-📌 GitHub: [aneeza009]((https://github.com/adnz1))
-```
+- **Aneeza Naheen**  
+  📌 GitHub: [aneeza009](https://github.com/aneeza009)  
+
+- **Muneefah Shahzad**  
+  📌 GitHub: [mun33fa](https://github.com/mun33fa)  
+
+- **Adan Zia**  
+  📌 GitHub: [adnz1](https://github.com/adnz1)  
+
